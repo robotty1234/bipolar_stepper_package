@@ -1,0 +1,8 @@
+bipolar_stepper:
+  ros__parameters:
+    step_pin: 23
+    dir_pin: 22
+    enable_pin: 17
+    step: 200
+    mini_rpm: 100.0
+    max_rpm: 1000.0
