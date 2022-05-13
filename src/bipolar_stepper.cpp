@@ -1,4 +1,6 @@
-#include <pigpiod_if2.h>
+//when debug this define must comentout
+//#define ENABLE_pigpio
+
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <std_msgs/msg/bool.hpp>
@@ -9,12 +11,11 @@
 #include <thread>
 #include <stdio.h>
 #include <unistd.h>
+#ifdef ENABLE_pigpio
+    #include <pigpiod_if2.h>
+#endif
 using namespace std;
 using stepper_interfaces::msg::StepperMsgs;
-
-
-//when debug this define must comentout
-//#define ENABLE_pigpio
 
 //global nodes
 rclcpp::Node::SharedPtr g_BioStep_node = nullptr;
