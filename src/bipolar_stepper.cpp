@@ -1,5 +1,5 @@
 //when debug this define must comentout
-//#define ENABLE_pigpio
+#define ENABLE_pigpio
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
@@ -82,7 +82,10 @@ int main(int argc, char **argv){
     //connect to a pigpio deamon
     #ifdef ENABLE_pigpio
         int pi = pigpio_start(NULL, NULL);
-        if (pi < 0) return 1;
+        if (pi < 0){
+            RCLCPP_INFO(g_BioStep_node->get_logger(), "ERROR: The pigpio daemon isn't running");
+            return 1;
+        }
         set_mode(pi, step_pin, PI_OUTPUT);
         set_mode(pi, dir_pin, PI_OUTPUT);
         set_mode(pi, enable_pin, PI_OUTPUT);
@@ -107,6 +110,7 @@ int main(int argc, char **argv){
                     step_spin = step_spin;
                     gpio_write(pi, dir_pin, PI_ON);
                     while (spinning < step_spin && spin_finite == true){
+                        RCLCPP_INFO(g_BioStep_node->get_logger(), "Right spinning stepper %d[step], remaining %d[step], speed %d[us]", spinning, (step_spin - spinning), stepper_us);
                         spinning++;
                         gpio_write(pi, step_pin, PI_ON);
                         usleep(stepper_us);
@@ -118,6 +122,7 @@ int main(int argc, char **argv){
                     step_spin = step_spin * (-1);
                     gpio_write(pi, dir_pin, PI_OFF);
                     while (spinning < step_spin && spin_finite == true){
+                        RCLCPP_INFO(g_BioStep_node->get_logger(), "Left spinning stepper %d[step], remaining %d[step], speed %d[us]", spinning, (step_spin - spinning), stepper_us);
                         spinning++;
                         gpio_write(pi, step_pin, PI_ON);
                         usleep(stepper_us);
@@ -137,6 +142,7 @@ int main(int argc, char **argv){
                 if(step_spin >= 0){    //right spin
                     gpio_write(pi, dir_pin, PI_ON);
                     while (spin_infinite == true){
+                        RCLCPP_INFO(g_BioStep_node->get_logger(), "Right infinite spinning stepper speed %d[us]", stepper_us);
                         gpio_write(pi, step_pin, PI_ON);
                         usleep(stepper_us);
                         gpio_write(pi, step_pin, PI_OFF);
@@ -146,6 +152,7 @@ int main(int argc, char **argv){
                 else if(step_spin < 0){    //lsft spin
                     gpio_write(pi, dir_pin, PI_OFF);
                     while (spin_infinite == true){
+                        RCLCPP_INFO(g_BioStep_node->get_logger(), "Left infinite spinning stepper speed %d[us]", stepper_us);
                         gpio_write(pi, step_pin, PI_ON);
                         usleep(stepper_us);
                         gpio_write(pi, step_pin, PI_OFF);
