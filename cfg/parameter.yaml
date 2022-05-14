@@ -4,5 +4,5 @@ bipolar_stepper:
     dir_pin: 23
     enable_pin: 17
     step: 200
-    mini_rpm: 100.0
-    max_rpm: 1000.0
+    mini_rpm: 15.0
+    max_rpm: 100.0

@@ -49,7 +49,11 @@ void interruptCommand(const std_msgs::msg::String::SharedPtr msg){
 void moveStepper(const StepperMsgs::SharedPtr msg){
     RCLCPP_INFO(g_BioStep_node->get_logger(), "get signal");
     //Define spin speed
-    stepper_us = (mini_stepper_delay_us * ((100.0 - msg->step_speed) / 100.0)) + max_stepper_delay_us;
+    if(msg->step_speed > 0.0){
+        stepper_us = (mini_stepper_delay_us * ((100.0 - msg->step_speed) / 100.0)) + max_stepper_delay_us;
+    }else{
+        stepper_us = 0.0;
+    }
     //Stepper motor power on
     power = msg->step_power;
     //Save step value
@@ -95,6 +99,7 @@ int main(int argc, char **argv){
     //setting speed[us]
     mini_stepper_delay_us = ((60000000.0 / mini_rpm) / step) / 2.0; 
     max_stepper_delay_us = ((60000000.0 / max_rpm) / step) / 2.0;
+    RCLCPP_INFO(g_BioStep_node->get_logger(), "mini_delay_us:%d, max_delay_us:%d", mini_stepper_delay_us, max_stepper_delay_us);
     //execute spin function in another thread
     rclcpp::WallRate(1);
     std::thread([]{rclcpp::spin(g_BioStep_node);}).detach();
@@ -109,7 +114,7 @@ int main(int argc, char **argv){
                 if(step_spin > 0){    //right spin
                     step_spin = step_spin;
                     gpio_write(pi, dir_pin, PI_ON);
-                    while (spinning < step_spin && spin_finite == true){
+                    while (spinning < step_spin && spin_finite == true && stepper_us > 0.0){
                         //RCLCPP_INFO(g_BioStep_node->get_logger(), "Right spinning stepper %d[step], remaining %d[step], speed %d[us]", spinning, (step_spin - spinning), stepper_us);
                         spinning++;
                         gpio_write(pi, step_pin, PI_ON);
@@ -121,7 +126,7 @@ int main(int argc, char **argv){
                 else if(step_spin < 0){    //lsft spin
                     step_spin = step_spin * (-1);
                     gpio_write(pi, dir_pin, PI_OFF);
-                    while (spinning < step_spin && spin_finite == true){
+                    while (spinning < step_spin && spin_finite == true && stepper_us > 0.0){
                         //RCLCPP_INFO(g_BioStep_node->get_logger(), "Left spinning stepper %d[step], remaining %d[step], speed %d[us]", spinning, (step_spin - spinning), stepper_us);
                         spinning++;
                         gpio_write(pi, step_pin, PI_ON);
@@ -141,7 +146,7 @@ int main(int argc, char **argv){
                 gpio_write(pi, enable_pin, PI_ON);
                 if(step_spin >= 0){    //right spin
                     gpio_write(pi, dir_pin, PI_ON);
-                    while (spin_infinite == true){
+                    while (spin_infinite == true && stepper_us > 0.0){
                         //RCLCPP_INFO(g_BioStep_node->get_logger(), "Right infinite spinning stepper speed %d[us]", stepper_us);
                         gpio_write(pi, step_pin, PI_ON);
                         usleep(stepper_us);
@@ -151,7 +156,7 @@ int main(int argc, char **argv){
                 }
                 else if(step_spin < 0){    //lsft spin
                     gpio_write(pi, dir_pin, PI_OFF);
-                    while (spin_infinite == true){
+                    while (spin_infinite == true && stepper_us > 0.0){
                         //RCLCPP_INFO(g_BioStep_node->get_logger(), "Left infinite spinning stepper speed %d[us]", stepper_us);
                         gpio_write(pi, step_pin, PI_ON);
                         usleep(stepper_us);
@@ -172,7 +177,7 @@ int main(int argc, char **argv){
                 int spinning = 0;
                 if(step_spin > 0){    //right spin
                     step_spin = step_spin;
-                    while (spinning < step_spin && spin_finite == true){
+                    while (spinning < step_spin && spin_finite == true && stepper_us > 0.0){
                         RCLCPP_INFO(g_BioStep_node->get_logger(), "Right spinning stepper %d[step], remaining %d[step], speed %d[us]", spinning, (step_spin - spinning), stepper_us);
                         spinning++;
                         usleep(stepper_us);
@@ -181,7 +186,7 @@ int main(int argc, char **argv){
                 }
                 else if(step_spin < 0){    //lsft spin
                     step_spin = step_spin * (-1);
-                    while (spinning < step_spin && spin_finite == true){
+                    while (spinning < step_spin && spin_finite == true && stepper_us > 0.0){
                         RCLCPP_INFO(g_BioStep_node->get_logger(), "Left spinning stepper %d[step], remaining %d[step], speed %d[us]", spinning, (step_spin - spinning), stepper_us);
                         spinning++;
                         usleep(stepper_us);
@@ -197,14 +202,14 @@ int main(int argc, char **argv){
                 spin_finite = false;
             }else if(spin_infinite == true){    //When finite rotation
                 if(step_spin >= 0){    //right spin
-                    while (spin_infinite == true){
+                    while (spin_infinite == true && stepper_us > 0.0){
                         RCLCPP_INFO(g_BioStep_node->get_logger(), "Right infinite spinning stepper speed %d[us]", stepper_us);
                         usleep(stepper_us);
                         usleep(stepper_us);
                     }
                 }
                 else if(step_spin < 0){    //lsft spin
-                    while (spin_infinite == true){
+                    while (spin_infinite == true && stepper_us > 0.0){
                         RCLCPP_INFO(g_BioStep_node->get_logger(), "Left infinite spinning stepper speed %d[us]", stepper_us);
                         usleep(stepper_us);
                         usleep(stepper_us);
