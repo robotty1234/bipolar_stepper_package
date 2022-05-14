@@ -49,7 +49,7 @@ void interruptCommand(const std_msgs::msg::String::SharedPtr msg){
 void moveStepper(const StepperMsgs::SharedPtr msg){
     RCLCPP_INFO(g_BioStep_node->get_logger(), "get signal");
     //Define spin speed
-    stepper_us = (max_stepper_delay_us * (msg->step_speed / 100.0)) + mini_stepper_delay_us;
+    stepper_us = (mini_stepper_delay_us * ((100.0 - msg->step_speed) / 100.0)) + max_stepper_delay_us;
     //Stepper motor power on
     power = msg->step_power;
     //Save step value
