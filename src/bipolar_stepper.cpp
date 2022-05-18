@@ -1,5 +1,5 @@
 //when debug this define must comentout
-//#define ENABLE_pigpio
+#define ENABLE_pigpio
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>

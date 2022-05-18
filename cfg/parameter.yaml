@@ -1,4 +1,4 @@
-bipolar_stepper:
+stepper:
   ros__parameters:
     step_pin: 22
     dir_pin: 23
