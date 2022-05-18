@@ -1,0 +1,8 @@
+stepper:
+  ros__parameters:
+    step_pin: 24
+    dir_pin: 25
+    enable_pin: 17
+    step: 200
+    mini_rpm: 15.0
+    max_rpm: 100.0
