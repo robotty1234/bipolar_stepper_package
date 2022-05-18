@@ -1,5 +1,5 @@
 //when debug this define must comentout
-#define ENABLE_pigpio
+//#define ENABLE_pigpio
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
@@ -137,8 +137,10 @@ int main(int argc, char **argv){
                 }
                 if(power == true){    //stepper power on
                     gpio_write(pi, enable_pin, PI_ON);
+                    spin_finite = false;
                 }else{    //stepper power off
                     gpio_write(pi, enable_pin, PI_OFF);
+                    spin_finite = false;
                     power = false;
                 }
                 spin_finite = false;
@@ -166,9 +168,11 @@ int main(int argc, char **argv){
                 }
                 if(power == true){    //stepper power on
                     gpio_write(pi, enable_pin, PI_ON);
+                    spin_infinite = false;
                 }else{    //stepper power off
                     gpio_write(pi, enable_pin, PI_OFF);
                     power = false;
+                    spin_infinite = false;
                 }
             }
         #else
@@ -195,8 +199,10 @@ int main(int argc, char **argv){
                 }
                 if(power == true){    //stepper power on
                     RCLCPP_INFO(g_BioStep_node->get_logger(), "Finish spin : power on");
+                    spin_finite = false;
                 }else{    //stepper power off
                     RCLCPP_INFO(g_BioStep_node->get_logger(), "Finish spin : power off");
+                    spin_finite = false;
                     power = false;
                 }
                 spin_finite = false;
@@ -217,9 +223,11 @@ int main(int argc, char **argv){
                 }
                 if(power == true){    //stepper power on
                     RCLCPP_INFO(g_BioStep_node->get_logger(), "Finish spin : power on");
+                    spin_infinite = false;
                 }else{    //stepper power off
                     RCLCPP_INFO(g_BioStep_node->get_logger(), "Finish spin : power off");
                     power = false;
+                    spin_infinite = false;
                 }
             }
         #endif
