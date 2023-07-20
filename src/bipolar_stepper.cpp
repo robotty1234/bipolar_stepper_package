@@ -73,7 +73,6 @@ int main(int argc, char **argv){
     rclcpp::init(argc, argv);
     g_BioStep_node = rclcpp::Node::make_shared("bipolar_stepper");
     RCLCPP_INFO(g_BioStep_node->get_logger(), "start bipolar_stepper");
-    auto subCmd = g_BioStep_node->create_subscription<std_msgs::msg::String>("interrCmd", 10, interruptCommand);
     auto subStepper = g_BioStep_node->create_subscription<StepperMsgs>("stepperCmd", 10, moveStepper);
     //read parameter
     int step_pin = g_BioStep_node->declare_parameter<int>("step_pin", 0);
